@@ -1,0 +1,17 @@
+flutter_app: 
+  command: custom_proxy_changer
+  arch: x64
+  parent: /usr/local/lib
+  nonInteractive: false
+
+control:
+  Package: custom-proxy-changer
+  Version: 1.0.0
+  Architecture: amd64
+  Priority: optional
+  Depends:
+  Maintainer: SiriusFtTpw
+  Description: An app for changing system wide proxy for debian based systems
+  
+#options:
+#  exec_out_dir: debian/packages
