@@ -91,7 +91,25 @@ class _ProxyManagerState extends State<ProxyManager> {
     try {
       await Process.run('bash', [
         '-c',
-        "echo 'http_proxy=http://$proxy:$port/' | sudo tee -a /etc/environment && echo 'https_proxy=https://$proxy:$port/' | sudo tee -a /etc/environment"
+        '''
+        sudo sed -i '/http_proxy/d' /etc/environment
+        sudo sed -i '/https_proxy/d' /etc/environment
+        echo 'http_proxy=http://$proxy:$port/' | sudo tee -a /etc/environment
+        echo 'https_proxy=https://$proxy:$port/' | sudo tee -a /etc/environment
+
+        echo 'export http_proxy=http://$proxy:$port/' | sudo tee /etc/profile.d/proxy.sh
+        echo 'export https_proxy=https://$proxy:$port/' | sudo tee -a /etc/profile.d/proxy.sh
+
+        if [ -f /etc/apt/apt.conf ]; then
+          sudo sed -i '/Acquire::http::Proxy/d' /etc/apt/apt.conf
+          echo 'Acquire::http::Proxy "http://$proxy:$port/";' | sudo tee -a /etc/apt/apt.conf
+        fi
+
+        if [ -f /etc/dnf/dnf.conf ]; then
+          sudo sed -i '/^proxy=/d' /etc/dnf/dnf.conf
+          echo 'proxy=http://$proxy:$port/' | sudo tee -a /etc/dnf/dnf.conf
+        fi
+        '''
       ]);
 
       await Process.run(
@@ -126,7 +144,19 @@ class _ProxyManagerState extends State<ProxyManager> {
     try {
       await Process.run('bash', [
         '-c',
-        "sudo sed -i '/http_proxy/d' /etc/environment && sudo sed -i '/https_proxy/d' /etc/environment"
+        '''
+        sudo sed -i '/http_proxy/d' /etc/environment
+        sudo sed -i '/https_proxy/d' /etc/environment
+        sudo rm -f /etc/profile.d/proxy.sh
+
+        if [ -f /etc/apt/apt.conf ]; then
+          sudo sed -i '/Acquire::http::Proxy/d' /etc/apt/apt.conf
+        fi
+
+        if [ -f /etc/dnf/dnf.conf ]; then
+          sudo sed -i '/^proxy=/d' /etc/dnf/dnf.conf
+        fi
+        '''
       ]);
 
       await Process.run(
