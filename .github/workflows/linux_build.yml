@@ -12,7 +12,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.7.12'
 
       - name: Enable Linux Desktop
         run: flutter config --enable-linux-desktop
