@@ -1,0 +1,42 @@
+name: Build Flutter Linux RPM
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Linux App
+        run: flutter build linux
+
+      - name: Install FPM dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ruby ruby-dev build-essential
+          sudo gem install --no-document fpm
+
+      - name: Build .rpm with FPM
+        run: |
+          fpm -s dir -t rpm -n my_flutter_app -v 1.0.0 \
+            --prefix /opt/my_flutter_app \
+            -C build/linux/x64/release/bundle/ .
+
+      - name: Upload .rpm artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my_flutter_app-rpm
+          path: ./*.rpm
