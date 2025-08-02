@@ -36,7 +36,7 @@ jobs:
             -C build/linux/x64/release/bundle/ .
 
       - name: Upload .rpm artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: my_flutter_app-rpm
           path: ./*.rpm
